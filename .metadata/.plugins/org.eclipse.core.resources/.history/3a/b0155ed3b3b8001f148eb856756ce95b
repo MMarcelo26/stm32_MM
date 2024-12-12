@@ -53,13 +53,13 @@ int main(void)
   while (1)
   {
 	  	//Controle por flag que só registra 1 pressionamento após o botão ser pressionado
-		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)==1){
 
 			if (botao_pressionado == 0){ //Só registra o evento 1 vez, ou seja,
 
 				HAL_Delay(20); //Debounce
 
-				if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){ //Confirma o estado do botão
+				if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 1){ //Confirma o estado do botão
 
 					botao_pressionado = 1;
 					sConfigOC.Pulse += 111; //Incrementa o Duty Cycle em 20%
@@ -72,8 +72,8 @@ int main(void)
 					}
 
 					//Atualiza PWM com o novo valor
-					//HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
-					//HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+					HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+					HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
 				}
 			}
