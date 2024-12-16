@@ -19,46 +19,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim3;
+TIM_OC_InitTypeDef sConfigOC;
 uint8_t botao_pressionado = 0; //Variável de controle
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM3_Init(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -67,47 +36,24 @@ static void MX_TIM3_Init(void);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM3_Init();
-  /* USER CODE BEGIN 2 */
 
-  //Iniciar o PWM (Timer 3 e canal 1)
+  //Inicia o PWM
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  sConfigOC.Pulse = 0; //Duty Cycle começando em 0%
 
-  // Valores de ARR (Auto-Reload Register) e passo de incremento
-  uint32_t max_duty = __HAL_TIM_GET_AUTORELOAD(&htim3); // Valor máximo do ARR (555)
-  uint32_t step = 80;  // Incremento
-  uint32_t duty = 0;   // Duty cycle inicial
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  	//Controle por flag que só registra 1 pressionamento após o botão ser pressionado
-		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+	  //Controle por flag que só registra 1 pressionamento após o botão ser pressionado
+		/*if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
 
 			if (botao_pressionado == 0){ //Só registra o evento 1 vez, ou seja,
 
@@ -116,28 +62,33 @@ int main(void)
 				if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){ //Confirma o estado do botão
 
 					botao_pressionado = 1;
-					duty += step;
+					sConfigOC.Pulse += 111; //Incrementa o Duty Cycle em 20%
 
 					//Reseta o Duty Cycle ao passar de 100%
-					if(duty > max_duty){
+					if(sConfigOC.Pulse > 555){
 
-						duty = 0; // Reinicia ao ultrapassar o valor máximo do ARR (555)
+						sConfigOC.Pulse = 0;
+
 					}
 
-					// Atualizar o duty cycle no CCR
-					__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);
+					//Atualiza PWM com o novo valor
+					HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+					HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
-					HAL_Delay(20);
 				}
 			}
 		}
 
 		else{
-			botao_pressionado = 0;
+			botao_pressionado = 0;*/
+
+
+
+
 		}
 
-  } //Fim do While
-} //fim da main
+  }
+
 
 /**
   * @brief System Clock Configuration
@@ -219,7 +170,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 111;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -240,12 +191,19 @@ static void MX_TIM3_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

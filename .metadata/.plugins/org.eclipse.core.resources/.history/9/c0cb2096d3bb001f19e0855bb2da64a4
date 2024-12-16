@@ -41,6 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim3;
+TIM_OC_InitTypeDef sConfigOC;
 uint8_t botao_pressionado = 0; //Variável de controle
 
 /* USER CODE BEGIN PV */

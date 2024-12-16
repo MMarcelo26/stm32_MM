@@ -41,6 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim3;
+TIM_OC_InitTypeDef sConfigOC;
 uint8_t botao_pressionado = 0; //Variável de controle
 
 /* USER CODE BEGIN PV */
@@ -97,7 +98,7 @@ int main(void)
 
   // Valores de ARR (Auto-Reload Register) e passo de incremento
   uint32_t max_duty = __HAL_TIM_GET_AUTORELOAD(&htim3); // Valor máximo do ARR (555)
-  uint32_t step = 80;  // Incremento
+  uint32_t step = 10;  // Incremento
   uint32_t duty = 0;   // Duty cycle inicial
 
   /* USER CODE END 2 */
@@ -125,7 +126,7 @@ int main(void)
 					}
 
 					// Atualizar o duty cycle no CCR
-					__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);
+					__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
 
 					HAL_Delay(20);
 				}
